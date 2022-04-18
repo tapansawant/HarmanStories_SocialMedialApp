@@ -41,7 +41,10 @@
             <a class="navbar-brand" href="/">HARMAN STORIES</a>
             <a class="nav-item nav-link" href="/home">Home</a>
             {% if user_is_authenticated %}
-            <a class="nav-item nav-link" href="#">Logout</a>
+            <a class="nav-item nav-link" href="/my-profile">My Profile</a>
+            <a class="nav-item nav-link" href="/my-posts">My Posts</a>
+            <a class="nav-item nav-link" href="/chat">Chat</a>
+            <a class="nav-item nav-link" href="/logout">Logout</a>
             {% else %}
             <a class="nav-item nav-link" href="/">Login</a>
             <a class="nav-item nav-link" href="/sign-up">Sign Up</a>

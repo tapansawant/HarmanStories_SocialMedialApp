@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block title %} Home{% endblock %} {% block
+    content %}
+ <div align="center">
+    <h3 style="text-align: center; color:rgb(212, 181, 139); font-family: Georgia, 'Times New Roman', Times, serif;">Welcome {{session.name}}</h3>
+    </div>
+    <div align="center">
+        <a href="/create-post"><button type="button" class="btn btn-primary btn-lg">Create a Post</button></a>
+      </div
+
+    <div class="container container">
+        <div class="row">
+            <div class="col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+                <table class="table table-hover">
+                  {% for i in posts %}
+                  <div class="card mb-3">
+                    <img src="https://m.media-amazon.com/images/M/MV5BNzZiYzQwMTQtNTc0MS00ODEwLWI2NzUtZDVhOTBlMDA1YmY2XkEyXkFqcGdeQXRyYW5zY29kZS13b3JrZmxvdw@@._V1_.jpg" class="card-img-top" alt="...">
+                    <div class="card-body">
+                      <h5 class="card-title">{{ i[2] }} </h5>
+                      <a href="/profile-username?username={{i[2]}}" class="link-dark">{{i[2]}} </a>
+                      <p class="card-text">{{ i[1] }}</p>
+                       <div>
+                        <span id=""> 3 </span> 
+                        <i class="far fa-thumbs-up" id=""></i>
+                    </div>
+                      <a href="/create-comment?id={{i[0]}}" class="btn btn-success">Comment</a>
+                      <a href="/view-comments?id={{i[0]}}" class="btn btn-dark">View Comments</a>
+                      {% if i[2] == username %}
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown"></button>
+                            <ul class="dropdown-menu">
+                            <li>
+                                <a href="/delete-post?id={{i[0]}}" class="dropdown-item">Delete</a>
+                            </li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                      <p class="card-text"><small class="text-muted"> Posted on {{i[3]}}</small></p>
+                    </div>
+                  </div>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+
+    </div>
+    {% endblock %}
