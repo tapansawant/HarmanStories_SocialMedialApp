@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 from flask_session import Session
 import sqlite3
 from datetime import datetime
 from flask_socketio import SocketIO
 
-con = sqlite3.connect('Harmanstories2.db', check_same_thread=False)
+con = sqlite3.connect('Harmanstories9.db', check_same_thread=False)
 
 cursor = con.cursor()
 
@@ -22,7 +22,9 @@ else:
                             EMAIL TEXT,
                             USERNAME TEXT,
                             PASSWORD TEXT,
-                            DATE_CREATED TEXT); ''')
+                            DATE_CREATED TEXT,
+                            DOB TEXT,
+                            IMAGELINK TEXT); ''')
     print("Table has created")
 
 if post_table:
@@ -33,8 +35,10 @@ else:
                             TEXT_BOX TEXT,
                             P_USERNAME TEXT,
                             P_DATE_CREATED TEXT,
+                            LIKE INTEGER DEFAULT 0 NOT NULL,
+                            IMAGELINK TEXT,
                             FOREIGN KEY (P_USERNAME)
-                                REFERENCES USERS(USER_ID)
+                                REFERENCES USERS(USERNAME)
                                 ON UPDATE CASCADE
                                 ON DELETE CASCADE); ''')
     print("Table has created")
@@ -54,19 +58,6 @@ else:
                                 ON DELETE CASCADE); ''')
     print("Table has created")
 
-if like_table:
-    print("Table Already Exists ! ")
-else:
-    con.execute(''' CREATE TABLE LIKES(
-                            LIKE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                            L_USERNAME TEXT,
-                            P_DATE_CREATED TEXT,
-                            FOREIGN KEY (L_USERNAME)
-                                REFERENCES USERS(USER_ID)
-                                ON UPDATE CASCADE
-                                ON DELETE CASCADE); ''')
-    print("Table has created")
-
 app = Flask(__name__)
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -77,7 +68,7 @@ socketio = SocketIO(app)
 
 @app.route("/chat")
 def sessions():
-    return render_template('session.html')
+    return render_template('session.html', user_is_authenticated=True)
 
 
 def messageReceived(methods=['GET', 'POST']):
@@ -107,8 +98,10 @@ def login_user():
                 for i in result:
                     getName = i[3]
                     getid = i[0]
+                    getImage = i[7]
                     session["name"] = getName
                     session["id"] = getid
+                    session["dp"] = getImage
                     flash("Logged in!", category='success')
                     print("success")
                 return redirect("/home")
@@ -155,10 +148,15 @@ def Home():
     else:
         try:
             logged_in = True
-            cursor.execute("SELECT * FROM POSTS")
+            # cursor.execute("SELECT * FROM POSTS ")
+            cursor.execute('''SELECT POSTS.POST_ID,POSTS.TEXT_BOX,POSTS.P_USERNAME,POSTS.P_DATE_CREATED,POSTS.LIKE,POSTS.IMAGELINK,
+                                USERS.IMAGELINK     
+                                FROM USERS
+                                INNER JOIN POSTS
+                                ON POSTS.P_USERNAME = USERS.USERNAME''')
             posts = cursor.fetchall()
             print(posts)
-            return render_template("home2.html", posts=posts, user_is_authenticated=logged_in, username=session['name'])
+            return render_template("home.html", posts=posts, user_is_authenticated=logged_in, username=session['name'])
         except Exception as e:
             print(e)
     # return render_template("home.html", user_is_authenticated=True)
@@ -170,18 +168,23 @@ def create_post():
         text = request.form["text"]
         curr_date = datetime.now()
         userName = session["name"]
-
-        if not text:
-            flash('Post cannot be empty', category='error')
-        else:
-            data = (text, userName, curr_date)
-            insert_query = '''INSERT INTO POSTS(TEXT_BOX,P_USERNAME,P_DATE_CREATED) 
-                                            VALUES (?,?,?)'''
+        destination_path = ""
+        fileobj = request.files['file']
+        file_extensions = ["JPG", "JPEG", "PNG", "GIF"]
+        uploaded_file_extension = fileobj.filename.split(".")[1]
+        if uploaded_file_extension.upper() in file_extensions:
+            destination_path = f"static/uploads/{fileobj.filename}"
+            fileobj.save(destination_path)
+            data = (text, userName, curr_date, destination_path)
+            insert_query = '''INSERT INTO POSTS(TEXT_BOX,P_USERNAME,P_DATE_CREATED,IMAGELINK) 
+                                                        VALUES (?,?,?,?)'''
             cursor.execute(insert_query, data)
             con.commit()
             flash('Post created!', category='success')
             return redirect("/home")
-
+        else:
+            flash("only images are accepted")
+            return render_template('home2.html')
     return render_template('create_post.html', user_is_authenticated=True)
 
 
@@ -200,41 +203,46 @@ def profile():
                 print("Invalid Data")
             else:
                 print(result)
-                return render_template("profile.html", user=result, user_is_authenticated=True)
+                return render_template("profile2.html", user=result, user_is_authenticated=True)
         except Exception as e:
             print(e)
-        #     if request.method == "POST":
-        #         getName = request.form["Name"]
-        #         getAddress = request.form["address"]
-        #         getEmail = request.form["email"]
-        #         getPhone = request.form["mno"]
-        #         try:
-        #             data = (getName, getAddress, getEmail, getPhone, getName)
-        #             insert_query = '''UPDATE USERS SET NAME = ?,ADDRESS=?,EMAIL=?,PHONE=?
-        #                                where NAME = ?'''
-        #
-        #             cursor.execute(insert_query, data)
-        #             print("SUCCESSFULLY UPDATED!")
-        #             con.commit()
-        #             return render_template("updateuser.html")
-        #         except Exception as e:
-        #             print(e)
-        #    else:
-        #         getName = session["name"]
-        #         print(getName)
-        #         try:
-        #             cursor.execute("SELECT* FROM USERS WHERE NAME= '" + getName + "'")
-        #             print("SUCCESSFULLY SELECTED!")
-        #             result = cursor.fetchall()
-        #             if len(result) == 0:
-        #                 print("Invalid Data")
-        #             else:
-        #                 print(result)
-        #                 return render_template("user_update.html", user=result)
-        #         except Exception as e:
-        #             print(e)
-
         return render_template("/profile.html", user_is_authenticated=True)
+
+
+@app.route("/update-profile", methods=["GET", "POST"])
+def update_profile():
+    if not session.get("name"):
+        return redirect("/")
+    else:
+        getUserName = session["name"]
+        print(getUserName)
+        try:
+            if request.method == "POST":
+                getName = request.form["Name"]
+                getUsername = request.form["username"]
+                getEmail = request.form["email"]
+                getdob = request.form["dob"]
+                destination_path = ""
+                fileobj = request.files['file']
+                file_extensions = ["JPG", "JPEG", "PNG", "GIF"]
+                uploaded_file_extension = fileobj.filename.split(".")[1]
+                if uploaded_file_extension.upper() in file_extensions:
+                    destination_path = f"static/uploads/{fileobj.filename}"
+                    fileobj.save(destination_path)
+                    data = (getName, getEmail, getUsername, getdob, destination_path, getUserName)
+                    insert_query = '''UPDATE USERS SET NAME = ?,EMAIL=?,USERNAME=?,DOB=?,IMAGELINK=?
+                                       where USERNAME = ?'''
+
+                    cursor.execute(insert_query, data)
+                    print("SUCCESSFULLY UPDATED!")
+                    con.commit()
+                    return redirect("/my-profile")
+                else:
+                    flash("only images are accepted")
+                    return render_template('profile2.html')
+
+        except Exception as e:
+            print(e)
 
 
 @app.route("/profile-username", methods=["GET", "POST"])
@@ -271,9 +279,11 @@ def posts():
             result = cursor.fetchall()
             if len(result) == 0:
                 print("Invalid Data")
+                flash('No posts yet...!', category='error')
+                return redirect("/home")
             else:
                 print(result)
-                return render_template("mypost.html", posts=result, user_is_authenticated=True)
+                return render_template("mypost.html", posts=result, user_is_authenticated=True, username=session["name"])
         except Exception as e:
             print(e)
 
@@ -295,7 +305,8 @@ def ViewComments():
         try:
             getId = request.args.get('id')
             Q = '''SELECT POSTS.POST_ID,POSTS.TEXT_BOX,POSTS.P_USERNAME,POSTS.P_DATE_CREATED,
-                    COMMENTS.COMMENT_ID,COMMENTS.P_ID,COMMENTS.COMMENT_TEXT_BOX,COMMENTS.C_USERNAME,COMMENTS.C_DATE_CREATED
+                    COMMENTS.COMMENT_ID,COMMENTS.P_ID,COMMENTS.COMMENT_TEXT_BOX,COMMENTS.C_USERNAME,COMMENTS.C_DATE_CREATED,
+                    POSTS.IMAGELINK
                     FROM POSTS
                     INNER JOIN COMMENTS
                     ON POSTS.POST_ID = COMMENTS.P_ID
@@ -331,6 +342,34 @@ def create_comment():
     return render_template('create-comment.html', user_is_authenticated=True)
 
 
+@app.route("/edit-post", methods=["GET", "POST"])
+def edit_post():
+    getId = request.args.get('id')
+    try:
+        if request.method == "POST":
+            text = request.form["text"]
+            destination_path = ""
+            fileobj = request.files['file']
+            file_extensions = ["JPG", "JPEG", "PNG", "GIF"]
+            uploaded_file_extension = fileobj.filename.split(".")[1]
+            if uploaded_file_extension.upper() in file_extensions:
+                destination_path = f"static/uploads/{fileobj.filename}"
+                fileobj.save(destination_path)
+                data = (text, destination_path, getId)
+                update_query = "UPDATE POSTS SET TEXT_BOX=?,IMAGELINK=? WHERE POST_ID = ?"
+                cursor.execute(update_query, data)
+                print("updated successfully")
+                con.commit()
+                flash('Post edited!', category='success')
+                return redirect("/home")
+            else:
+                flash("only images are accepted")
+                return render_template('home.html')
+    except Exception as e:
+        print(e)
+    return render_template('edit-post.html', user_is_authenticated=True)
+
+
 @app.route("/delete-post", methods=["GET", "POST"])
 def delete_post():
     getId = request.args.get('id')
@@ -355,6 +394,46 @@ def delete_comment():
         return redirect("/home")
     except Exception as e:
         print(e)
+
+
+@app.route("/like", methods=["GET", "POST"])
+def like():
+    getId = request.args.get('id')
+    q = "SELECT LIKE FROM POSTS WHERE POST_ID = ?"
+    cursor.execute(q, (getId,))
+    print("SUCCESSFULLY SELECTED!")
+    count = cursor.fetchall()
+    print(count)
+    like_count = 0
+    for i in count:
+        like_count = i[0]
+    like_count = like_count + 1
+
+    try:
+        data = (like_count, getId)
+        Q = "UPDATE POSTS SET LIKE = ? where POST_ID=? "
+        cursor.execute(Q, data)
+        print("SUCCESSFULLY updated!")
+        con.commit()
+        return redirect("/home")
+    except Exception as e:
+        print(e)
+
+
+@app.route("/view-all-users", methods=["GET", "POST"])
+def Viewusers():
+    if not session.get("name"):
+        return redirect("/login-user")
+    else:
+        try:
+            cursor.execute("SELECT * FROM USERS")
+            print("SUCCESSFULLY SELECTED!")
+            result = cursor.fetchall()
+            print(result)
+            return render_template("viewallusers.html", users=result, user_is_authenticated=True,
+                                   username=session['name'])
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":

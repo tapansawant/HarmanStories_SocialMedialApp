@@ -1,10 +1,123 @@
-<!-- 
 {% extends "base.html" %} {% block title %} Home{% endblock %} {% block
-    content %}
- <div align="center">
-      <a href="/create-post"><button type="button" class="btn btn-primary btn-lg">Create a Post</button></a>
+  content %}
+   <!--------------------------- left-sidebar ------------------>
+   <div class="left-sidebar">
+    <div class="imp-links">
+        <a href="https://timesofindia.indiatimes.com/" style="color:rgb(250, 248, 252)" class="font-weight-bold"><img src="{{url_for('static', filename='news.png')}}">Latest News</a>
+        <a href="/view-all-users" style="color:rgb(250, 248, 252)" class="font-weight-bold"><img src="{{url_for('static', filename='friends.png')}}">Friends</a>
+        <a href="#">See more</a>
     </div>
-    {% endblock %} -->
+</div>
+<!--------------------------- Main-content ------------------>
+<div class="main-content">
+    <div class="write-post-container">
+
+        <div class="user-profile">
+            <!-- <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"> -->
+            {% set count = 0 %}
+            {% for i in posts %} 
+              {% if username == i[2]%}
+               {%if (count <= 0) %}
+                  <img src="{{i[6]}}">
+                  {% set count = count + 1 %}
+                {% endif %}
+              {% endif %}
+            {%endfor%}
+            <div>
+                  <p>{{session.name}}</p>
+                  <small>Write here</small>
+            </div>
+        </div>
+       
+        <div class="post-input-container">
+          <form enctype="multipart/form-data" method="post" action="/create-post" >
+            <textarea name="text" id="text" cols="30" rows="3" placeholder="Whats on your mind??"></textarea>
+            <div class="add-post-links">
+                <img src="{{url_for('static', filename='photo.png')}}">&nbsp; &nbsp; &nbsp; 
+                <input type="file" name="file" id="fileToUpload">
+                <button type="submit" class="btn btn-primary btn-sm">Post</button>
+            </div>  
+        </form>
+            
+        </div>
+    </div>
+    {% for i in posts %} 
+    <div class="post-container">
+      <div class="user-profile">
+          <img src="{{i[6]}}">
+          <div>
+                <p>{{ i[2] }}</p>
+                <span>{{i[3]}}</span>
+          </div>
+      </div>
+      <p class="post-text">{{ i[1] }}</p>
+      <img src="{{i[5]}}" class="post-img">
+      <div class="post-row">
+          <div class="activity-icons">
+              <div>
+                <!-- <img src="{{url_for('static', filename='like-blue.png')}}" id="like-button"> -->
+                <a href="/like?id={{i[0]}}" class="btn btn-dark btn-sm">{{i[4]}} likes</a>
+              </div>
+              <div>
+                  <!-- <img src="{{url_for('static', filename='comments.png')}}"> -->
+                  <a href="/create-comment?id={{i[0]}}" class="btn btn-dark btn-sm">Comment</a>
+              </div>
+              <div>
+                  <a href="/view-comments?id={{i[0]}}"class="btn btn-dark btn-sm">View Comments</a>
+              </div>
+              <div>
+                  {% if i[2] == username %} 
+                  <div class="btn-group">
+                      <button type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown"></button>
+                      <ul class="dropdown-menu">
+                      <li>
+                          <a href="/edit-post?id={{i[0]}}" class="dropdown-item">Edit Post</a>
+                          <a href="/delete-post?id={{i[0]}}" class="dropdown-item">Delete</a>
+                      </li>
+                      </ul>
+                  </div>
+                  {% endif %}
+              </div>
+           </div>
+      </div>
+    </div>
+    {% endfor %}
+
+</div>
+<!--------------------------- right-sidebar ------------------>
+<div class="right-sidebar">
+    <div class="sidebar-title">
+        <h4>Events</h4>
+        <a href="#">See All</a>
+    </div>
+    <div class="event">
+        <div class="left-event">
+            <h3>18</h3>
+            <span>March</span>
+        </div>
+        <div class="right-event">
+            <h4>Social Media</h4>
+            <p>Bangalore</p>
+            <a href="#">More info</a>
+        </div>
+    </div>
+    <div class="event">
+      <div class="left-event">
+          <h3>22</h3>
+          <span>September</span>
+      </div>
+      <div class="right-event">
+          <h4>Alan Walker Consert</h4>
+          <p>Bangalore</p>
+          <a href="#">More info</a>
+      </div>
+  </div>
+
+<div class="footer">
+<p style="color:rgb(4, 1, 6)" class="font-weight-bold">Copyright 2022 - HARMAN Connected Services</p>
+</div>
+<script src="/static/script.js"></script>
 
 
-{% extends "posts_div.html" %} {% block title %}Home{% endblock %}
+
+  {% endblock %}

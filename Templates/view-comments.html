@@ -1,30 +1,31 @@
 {% extends "base.html" %} {% block title %} Home{% endblock %} {% block
     content %}
- <div align="center">
-    <h3 style="text-align: center; color:rgb(212, 181, 139); font-family: Georgia, 'Times New Roman', Times, serif;">Welcome {{session.name}}</h3>
-    </div>
 
+    <div class="main-content">
     <div class="container container">
         <div class="row">
             <div class="col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                 <table class="table table-hover">
                     {% for i in posts %}
                     {% if loop.first %}
-                          <div class="card mb-3">
-                            <img src="..." class="card-img-top" alt="...">
-                            <div class="card-body">
-                              <h5 class="card-title">{{ i[2] }} </h5>
-                              <p class="card-text">{{ i[1] }}</p>
-                              <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                            </div>
+                    <div class="post-container">
+                      <div class="user-profile">
+                          <img src="{{i[9]}}">
+                          <div>
+                                <p>{{ i[2] }}</p>
+                                <span>{{i[3]}}</span>
                           </div>
+                      </div>
+                      <p class="post-text">{{ i[1] }}</p>
+                      <img src="{{i[9]}}" class="post-img">
+                    </div>
                                 {% endif %}
                             <div class="card mb-3">
                               <div class="card-body">
                                 <p class="card-text">{{ i[7] }}</p>
                                 <p class="card-text">{{ i[6] }}</p>
                                 <p class="card-text">{{ i[8] }}</p>
-                                {% if i[2] == username %}
+                                {% if i[7] == username %}
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown"></button>
                                     <ul class="dropdown-menu">
@@ -40,6 +41,7 @@
                 </table>
             </div>
         </div>
+    </div>
 
     </div>
     {% endblock %}

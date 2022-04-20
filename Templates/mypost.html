@@ -1,20 +1,56 @@
 
     {% extends "base.html" %} {% block title %} Home{% endblock %} {% block
         content %}
-     <div align="center">
-        <h3 style="text-align: center; color:rgb(212, 181, 139); font-family: Georgia, 'Times New Roman', Times, serif;">Welcome {{session.name}}</h3>
-        </div>
-    
+  
+        <div class="left-sidebar">
+          <div class="imp-links">
+              <a href="https://timesofindia.indiatimes.com/" style="color:rgb(250, 248, 252)" class="font-weight-bold"><img src="{{url_for('static', filename='news.png')}}">Latest News</a>
+              <a href="/view-all-users" style="color:rgb(250, 248, 252)" class="font-weight-bold"><img src="{{url_for('static', filename='friends.png')}}">Friends</a>
+              <a href="#">See more</a>
+          </div>
+      </div>
+      <div class="main-content">
         <div class="container container">
             <div class="row">
                 <div class="col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                       {% for i in posts %}
-                      <div class="card mb-3">
-                        <img src="..." class="card-img-top" alt="...">
-                        <div class="card-body">
-                          <h5 class="card-title">{{ i[2] }} </h5>
-                          <p class="card-text">{{ i[1] }}</p>
-                          <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                      <div class="post-container">
+                        <div class="user-profile">
+                            <img src="{{i[5]}}">
+                            <div>
+                                  <p>{{ i[2] }}</p>
+                                  <span>{{i[3]}}</span>
+                            </div>
+                        </div>
+                        <p class="post-text">{{ i[1] }}</p>
+                        <img src="{{i[5]}}" class="post-img">
+                        <div class="post-row">
+                            <div class="activity-icons">
+                                <div>
+                                  <!-- <img src="{{url_for('static', filename='like-blue.png')}}" id="like-button"> -->
+                                  <a href="/like?id={{i[0]}}" class="btn btn-dark btn-sm">{{i[4]}} likes</a>
+                                </div>
+                                <div>
+                                    <!-- <img src="{{url_for('static', filename='comments.png')}}"> -->
+                                    <a href="/create-comment?id={{i[0]}}" class="btn btn-dark btn-sm">Comment</a>
+                                </div>
+                                <div>
+                                    <a href="/view-comments?id={{i[0]}}"class="btn btn-dark btn-sm">View Comments</a>
+                                </div>
+                                <div>
+                                  {% if i[2] == username %} 
+                                  <div class="btn-group">
+                                      <button type="button" class="btn btn-sm btn-danger dropdown-toggle" data-bs-toggle="dropdown"></button>
+                                      <ul class="dropdown-menu">
+                                      <li>
+                                          <a href="/edit-post?id={{i[0]}}" class="dropdown-item">Edit Post</a>
+                                          <a href="/delete-post?id={{i[0]}}" class="dropdown-item">Delete</a>
+                                      </li>
+                                      </ul>
+                                  </div>
+                                  {% endif %}
+                              </div>
+                             </div>
                         </div>
                       </div>
                         {% endfor %}
@@ -22,4 +58,39 @@
             </div>
     
         </div>
+        </div>
+        <!--------------------------- right-sidebar ------------------>
+<div class="right-sidebar">
+  <div class="sidebar-title">
+      <h4>Events</h4>
+      <a href="#">See All</a>
+  </div>
+  <div class="event">
+      <div class="left-event">
+          <h3>18</h3>
+          <span>March</span>
+      </div>
+      <div class="right-event">
+          <h4>Social Media</h4>
+          <p>Bangalore</p>
+          <a href="#">More info</a>
+      </div>
+  </div>
+  <div class="event">
+    <div class="left-event">
+        <h3>22</h3>
+        <span>September</span>
+    </div>
+    <div class="right-event">
+        <h4>Alan Walker Consert</h4>
+        <p>Bangalore</p>
+        <a href="#">More info</a>
+    </div>
+</div>
+
+<div class="footer">
+<p style="color:rgb(4, 1, 6)" class="font-weight-bold">Copyright 2022 - HARMAN Connected Services</p>
+</div>
+<script src="/static/script.js"></script>
+
         {% endblock %}

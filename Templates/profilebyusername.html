@@ -1,32 +1,56 @@
 
 {% extends "base.html" %} {% block title %} Home{% endblock %} {% block
     content %}
- <div align="center">
-    <h3 style="text-align: center; color:rgb(212, 181, 139); font-family: Georgia, 'Times New Roman', Times, serif;">Welcome {{session.name}}</h3>
-    <h5 style="text-align: center; color:rgb(212, 181, 139); font-family: Georgia, 'Times New Roman', Times, serif;">Profile</h5>
-    </div>
         <div class="container container">
             <div class="row">
                 <div class="col col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                    <form action="/my-profile" method='post'>
                     <table class="table table-hover">
                       {% for i in user %}
-                        <tr>
-                          <td style="color:rgb(250, 248, 252)" class="font-weight-bold"> Name</td>    
-                          <td>  <input  name="Name" class="form-control"  value={{ i[1] }} type="text">  </td>  
-                        </tr>   
-                         <tr> 
-                             <td style="color:rgb(250, 248, 252)" class="font-weight-bold">Email</td>  
-                             <td>  <input name="email" class="form-control" value={{ i[2] }} type="text">  </td>
-                        </tr>   
-                         <tr> 
-                            <td style="color:rgb(250, 248, 252)" class="font-weight-bold">Username</td>  
-                            <td>  <input name="mno"  class="form-control" value={{ i[3] }} type="text">  </td>
-                        </tr>  
-                        <tr> 
-                            <td style="color:rgb(250, 248, 252)" class="font-weight-bold">Date Created</td>  
-                            <td>  <input name="mno"  class="form-control" value={{ i[5] }} type="text" readonly>  </td>
-                        </tr>
+                      <div class="container">
+                        <div class="row d-flex justify-content-center">
+                         <div class="col-md-10 mt-5 pt-5"></div>
+                            <div class="row z-depth-3">
+                              <div class="card col-sm-3 bg-dark rounded-left">
+                                <div class="card-block text-center text-white">
+                                  <h2 class="font-weight-bold mt-4"><img src="{{i[7]}}" class="card-img-top" alt="...">{{ i[3] }}</h2>
+                                </div>
+    
+                                
+                             </div>
+                              <div class="card col-sm-8 bg-light rounded-right">
+                                <h3 class="mt-3">Information</h3>
+                                <hr class="bg-primary">
+                                <div class="row">
+                                  <div class="col-sm-4">
+                                    <p class="font-weight-bold">Username:</p>
+                                    <h6 class="text-muted">{{ i[3] }}</h6>
+                                  </div>
+                                  <div class="col-sm-4">
+                                    <p class="font-weight-bold">Name:</p>
+                                    <h6 class="text-muted">{{ i[1] }}</h6>
+                                  </div>
+                                  <div class="col-sm-4">
+                                   <p class="font-weight-bold">DOB:</p>
+                                   <h6 class="text-muted">{{i[6]}}</h6>
+                                 </div>
+                                </div>
+                                <hr class="bg-primary">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                    <p class="font-weight-bold">Email:</p>
+                                    <h6 class="text-muted">{{i[2]}}</h6>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <p class="font-weight-bold">Account Created:</p>
+                                        <h6 class="text-muted">{{i[5]}}</h6>
+                                        </div>
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         {% endfor %}
                     </table>
                    </form>

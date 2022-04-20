@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% block title %} Home{% endblock %} {% block
+    content %}
+
+    <div class="main-content">
+        <div class="write-post-container">
+            <div class="user-profile">
+                <!-- <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"> -->
+                <img src="{{session.dp}}">
+                <div>
+                      <p>{{session.name}}</p>
+                      <small>Write here</small>
+                </div>
+            </div>
+            <div class="post-input-container">
+              <form enctype="multipart/form-data" method="post" action="/edit-post" >
+                <textarea name="text" id="text" cols="30" rows="3" placeholder="Edit ur caption here"></textarea>
+                <div class="add-post-links">
+                    <img src="{{url_for('static', filename='photo.png')}}">&nbsp; &nbsp; &nbsp; 
+                    <input type="file" name="file">
+                    <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                </div>  
+            </form>
+                
+            </div>
+        </div>
+    </div>
+
+        <script src="script.js"></script>
+        
+        
+        
+          {% endblock %}
+        

@@ -1,0 +1,94 @@
+
+{% extends "base.html" %} {% block title %} Home{% endblock %} {% block
+    content %}
+
+ {% for i in user %}
+ <div class="container">
+    <div class="row d-flex justify-content-center">
+     <div class="col-md-10 mt-5 pt-5"></div>
+        <div class="row z-depth-3">
+          <div class="card col-sm-3 bg-dark rounded-left">
+            <div class="card-block text-center text-white">
+              <h2 class="font-weight-bold mt-4"><img src="{{i[7]}}" class="card-img-top" alt="...">{{ i[3] }}</h2>
+            </div>
+            <div class="card-block text-center text-white">
+               <p>Fill bio here</p>
+               <i class="far fa-edit fa-x mb-4"></i>
+             </div>
+             <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">Edit profile</button>
+             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                   <div class="offcanvas-header">
+                      <h5 id="offcanvasRightLabel">Edit your profile</h5>
+                      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                <form enctype="multipart/form-data" action="/update-profile" method='post'>
+                    <div class="offcanvas-body">
+                        <tr>
+                          <td style="color:rgb(250, 248, 252)" class="font-weight-bold"> Name</td>    
+                          <td>  <input  name="Name" class="form-control"  value={{ i[1] }} type="text">  </td>  
+                        </tr>   
+                         <tr> 
+                             <td style="color:rgb(250, 248, 252)" class="font-weight-bold">Email</td>  
+                             <td>  <input name="email" class="form-control" value={{ i[2] }} type="text">  </td>
+                        </tr>   
+                         <tr> 
+                            <td style="color:rgb(250, 248, 252)" class="font-weight-bold">Username</td>  
+                            <td>  <input name="username"  class="form-control" value={{ i[3] }} type="text">  </td>
+                        </tr>  
+                        <tr> 
+                            <td style="color:rgb(250, 248, 252)" class="font-weight-bold">Date of Birth</td>  
+                            <td>  <input name="dob"  class="form-control" value={{ i[6] }} type="date">  </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="file" name="file" value={{ i[7] }}>
+                            </td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                          <td>   <button  type="submit" class="btn btn-primary">  UPDATE PROFILE </button>  </td>
+                        </tr>
+                               </div>
+                            </form>
+                       </div>
+         </div>
+          <div class="card col-sm-8 bg-light rounded-right">
+            <h3 class="mt-3">Information</h3>
+            <hr class="bg-primary">
+            <div class="row">
+              <div class="col-sm-4">
+                <p class="font-weight-bold">Username:</p>
+                <h6 class="text-muted">{{ i[3] }}</h6>
+              </div>
+              <div class="col-sm-4">
+                <p class="font-weight-bold">Name:</p>
+                <h6 class="text-muted">{{ i[1] }}</h6>
+              </div>
+              <div class="col-sm-4">
+               <p class="font-weight-bold">DOB:</p>
+               <h6 class="text-muted">{{i[6]}}</h6>
+             </div>
+            </div>
+            <hr class="bg-primary">
+            <div class="row">
+                <div class="col-sm-6">
+                <p class="font-weight-bold">Email:</p>
+                <h6 class="text-muted">{{i[2]}}</h6>
+                </div>
+                <div class="col-sm-6">
+                    <p class="font-weight-bold">Account Created:</p>
+                    <h6 class="text-muted">{{i[5]}}</h6>
+                    </div>
+            </div>
+            <hr class="bg-primary">
+            <ul class="list-unstyled d-flex justify-content-center mt-4">
+              <a href="mailto:" role="button" style="margin-right: 5px;" class="btn btn-primary">Mail me</a>
+              <a href="tel:" role="button" style="margin-right: 5px;" class="btn btn-primary">Contact me</a>
+              <a href="#" role="button" class="btn btn-primary">Youtube</a>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endblock %}
