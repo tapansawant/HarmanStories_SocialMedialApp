@@ -13,16 +13,8 @@
     <div class="write-post-container">
 
         <div class="user-profile">
-            <!-- <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"> -->
-            {% set count = 0 %}
-            {% for i in posts %} 
-              {% if username == i[2]%}
-               {%if (count <= 0) %}
-                  <img src="{{i[6]}}">
-                  {% set count = count + 1 %}
-                {% endif %}
-              {% endif %}
-            {%endfor%}
+            <!-- <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460__340.png"> -->         
+                  <img src="{{session.dp}}">
             <div>
                   <p>{{session.name}}</p>
                   <small>Write here</small>

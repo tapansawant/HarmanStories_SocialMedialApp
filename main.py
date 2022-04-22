@@ -107,7 +107,7 @@ def login_user():
                 return redirect("/home")
         except Exception as e:
             print(e)
-    return render_template("login.html")
+    return render_template("newlogin.html")
 
 
 @app.route("/sign-up", methods=["GET", "POST"])
@@ -138,13 +138,13 @@ def register_user():
 
         except Exception as e:
             print(e)
-    return render_template("signup.html")
+    return render_template("newsignup.html")
 
 
 @app.route("/home", methods=["GET", "POST"])
 def Home():
     if not session.get("name"):
-        return redirect("/login-user")
+        return redirect("/")
     else:
         try:
             logged_in = True
@@ -153,8 +153,13 @@ def Home():
                                 USERS.IMAGELINK     
                                 FROM USERS
                                 INNER JOIN POSTS
-                                ON POSTS.P_USERNAME = USERS.USERNAME''')
+                                ON POSTS.P_USERNAME = USERS.USERNAME
+                                ORDER BY POSTS.POST_ID ASC''')
             posts = cursor.fetchall()
+            for i in posts:
+                if i[2] == session['name']:
+                    getImage = i[6]
+                    session["dp"] = getImage
             print(posts)
             return render_template("home.html", posts=posts, user_is_authenticated=logged_in, username=session['name'])
         except Exception as e:
@@ -283,7 +288,8 @@ def posts():
                 return redirect("/home")
             else:
                 print(result)
-                return render_template("mypost.html", posts=result, user_is_authenticated=True, username=session["name"])
+                return render_template("mypost.html", posts=result, user_is_authenticated=True,
+                                       username=session["name"])
         except Exception as e:
             print(e)
 
@@ -383,6 +389,19 @@ def delete_post():
         print(e)
 
 
+@app.route("/delete-user", methods=["GET", "POST"])
+def delete_user():
+    getId = session['name']
+    try:
+        Q = "DELETE FROM USERS WHERE USERNAME = ?"
+        cursor.execute(Q, (getId,))
+        print("SUCCESSFULLY DELETED!")
+        con.commit()
+        return redirect("/")
+    except Exception as e:
+        print(e)
+
+
 @app.route("/delete-comment", methods=["GET", "POST"])
 def delete_comment():
     getId = request.args.get('id')
@@ -423,7 +442,7 @@ def like():
 @app.route("/view-all-users", methods=["GET", "POST"])
 def Viewusers():
     if not session.get("name"):
-        return redirect("/login-user")
+        return redirect("/")
     else:
         try:
             cursor.execute("SELECT * FROM USERS")
